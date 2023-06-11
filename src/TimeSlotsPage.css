@@ -1,0 +1,51 @@
+.time-slots-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.time-slot {
+  margin: 5px;
+}
+
+.time-slot button {
+  margin: 10px;
+  width: 105px;
+  height: 40px;
+}
+
+.time-slots-wrapper {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  display: inline-block;
+}
+
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.available-times-box {
+  background-color: white;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.select-services {
+  align-items: center;
+  justify-content: center;
+  margin-top: 230px;
+}
