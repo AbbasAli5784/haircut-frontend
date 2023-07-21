@@ -5,6 +5,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "../TimeSlotsPage.css";
 import moment from "moment";
 import "moment-timezone";
+import Clock from "./pictures/clock.png";
+
+import Header from "../components/Header";
 
 function TimeSlotsPage() {
   const location = useLocation();
@@ -23,8 +26,10 @@ function TimeSlotsPage() {
 
   const getBookedTimeSlots = async (date) => {
     try {
-      const timezone = "America/Toronto";
+      const timezone = "America/New_York";
       const convertedDate = moment(date).tz(timezone).format("YYYY-MM-DD");
+      console.log("Selected date:", date);
+      console.log("Converted date:", convertedDate);
       const response = await axios.get(
         `http://localhost:3001/api/bookings/date/${convertedDate}`
       );
@@ -63,28 +68,44 @@ function TimeSlotsPage() {
         time: time,
       },
     });
+
+    console.log("location state 3:", location.state);
   };
 
   return (
-    <div className="time-slots-container">
-      <div className="time-slots-wrapper">
-        <div className="available-times-box">Available times</div>
-        <div className="justify-content-md-center time-slots">
-          {timeSlots.map((timeSlot) => (
-            <div key={timeSlot} className="time-slot">
-              <Button
-                className="time-slot button"
-                variant="outline-primary"
-                disabled={bookedTimeSlots.includes(timeSlot)}
-                onClick={() => handleTimeSlotClick(timeSlot)}
-              >
-                {timeSlot}
-              </Button>
+    <>
+      <Header />
+
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 animate-slideInRight">
+        <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-md">
+          <div>
+            <div className="flex items-center justify-center mt-6 text-center">
+              <h2 className="text-3xl font-extrabold text-gray-900 mr-4 -mt-2 ">
+                Available Times
+              </h2>
+              <img src={Clock} alt="Clock" className="h-10 w-10 -ml-3" />
             </div>
-          ))}
+            <ul className="mt-5 space-y-4">
+              {timeSlots.map((timeSlot) => (
+                <li key={timeSlot} className="rounded-md shadow-sm">
+                  <button
+                    onClick={() => handleTimeSlotClick(timeSlot)}
+                    className={`${
+                      bookedTimeSlots.includes(timeSlot)
+                        ? "bg-gray-300"
+                        : "bg-indigo-600 hover:bg-indigo-700"
+                    } w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                    disabled={bookedTimeSlots.includes(timeSlot)}
+                  >
+                    {timeSlot}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

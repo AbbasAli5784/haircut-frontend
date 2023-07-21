@@ -1,17 +1,11 @@
-import React from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  ListGroup,
-  ListGroupItem,
-} from "react-bootstrap";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import Header from "./Header";
 
 const SelectService = () => {
   const services = [
-    { id: 1, name: "Haircut" },
+    { id: 1, name: "Haircut " },
     { id: 2, name: "HairCut + Beard" },
     { id: 3, name: "LineUp" },
   ];
@@ -20,34 +14,53 @@ const SelectService = () => {
 
   const handleServiceClick = (service) => {
     console.log("Selected Service:", service);
-    navigate(`/booking/${service.id}`, {
-      state: { selectedService: service },
+
+    setTimeout(() => {
+      navigate(`/booking/${service.id}`, {
+        state: { selectedService: service },
+      });
     });
   };
 
   return (
-    <Container>
-      <div className="select-services">
-        <Row className="justify-content-md-center">
-          <Col md="auto">
-            <Card style={{ width: "18rem" }} className="text-center">
-              <Card.Header>Services</Card.Header>
-              <ListGroup variant="flush">
-                {services.map((service) => (
-                  <ListGroupItem
-                    key={service.id}
-                    action
+    <>
+      {/* <motion.div
+        initial={{ opacity: 0, x: "100vw" }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ type: "tween", ease: "anticipate", duration: 1 }}
+      > */}
+      <Header />
+      {/* </motion.div> */}
+      {/* <motion.div
+        className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+        initial={{ opacity: 0, x: "100vw" }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ type: "tween", ease: "anticipate", duration: 2 }}
+      > */}
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 animate-slideInRight">
+        <div className=" max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-md">
+          <div>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              Services
+            </h2>
+
+            <ul className="mt-5 space-y-4">
+              {services.map((service) => (
+                <li key={service.id} className="rounded-md shadow-sm">
+                  <button
                     onClick={() => handleServiceClick(service)}
+                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     {service.name}
-                  </ListGroupItem>
-                ))}
-              </ListGroup>
-            </Card>
-          </Col>
-        </Row>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
-    </Container>
+      {/* </motion.div> */}
+    </>
   );
 };
 

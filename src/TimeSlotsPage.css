@@ -22,7 +22,8 @@
   border-radius: 5px;
   padding: 20px;
   background-color: #f8f9fa;
-  display: inline-block;
+  display: grid;
+  grid-template-columns: 20% 80%;
 }
 
 .time-slots {
