@@ -14,23 +14,46 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./components/context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminPanel from "./components/AdminPanel";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route exact path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/booking/login" element={<Auth />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/select-service" element={<SelectService />} />
-          <Route path="/time-slots" element={<TimeSlotsPage />} />
-          <Route path="/booking/:serviceID" element={<BookingPage />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="booking-details" element={<BookingDetails />} />
-          <Route path="booking-summary" element={<BookingSummary />} />
-          <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/admin-panel" element={<AdminPanel />} />
+          <Route
+            path="/select-service"
+            element={<ProtectedRoute element={<SelectService />} />}
+          />
+          <Route
+            path="/time-slots"
+            element={<ProtectedRoute element={<TimeSlotsPage />} />}
+          />
+          <Route
+            path="/booking/:serviceID"
+            element={<ProtectedRoute element={<BookingPage />} />}
+          />
+          <Route
+            path="/forgot-password"
+            element={<ProtectedRoute element={<ForgotPassword />} />}
+          />
+          <Route
+            path="/booking-details"
+            element={<ProtectedRoute element={<BookingDetails />} />}
+          />
+          <Route
+            path="/booking-summary"
+            element={<ProtectedRoute element={<BookingSummary />} />}
+          />
+          <Route
+            path="/confirmation"
+            element={<ProtectedRoute element={<Confirmation />} />}
+          />
         </Routes>
       </AuthProvider>
     </Router>

@@ -3,6 +3,9 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import { motion } from "framer-motion";
+import { useContext } from "react";
+import { AuthContext } from "../components/context/AuthContext";
+import jwtDecode from "jwt-decode";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,14 +14,35 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const api = axios.create({
+    baseURL: "http://localhost:3001/api",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  api.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("token");
+      console.log("Intercepted token: ", token);
+
+      if (token) {
+        config.headers.authorization = `Bearer ${token}`;
+      }
+      console.log("Request headers after intercepting: ", config);
+
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
   const forgotPassword = async (e) => {
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/users/request-password-reset",
-        {
-          email,
-        }
-      );
+      const response = await api.post("/users/request-password-reset", {
+        email,
+      });
     } catch (error) {
       setError(error.response.data.message);
     }
@@ -29,23 +53,25 @@ function LoginPage() {
 
     try {
       const { selectedService, selectedDate, time } = location.state || {}; // Access state here
-      const response = await axios.post(
-        "http://localhost:3001/api/users/login",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await api.post("/users/login", {
+        email,
+        password,
+      });
 
       // Save the token in local storage (or you might use Redux, Context API, etc.)
       localStorage.setItem("token", response.data.token);
 
-      // Redirect user to another page
-      // navigate("/booking-details", {
-      //   state: { selectedService, selectedDate, time },
-      // });
+      console.log("Token:", response.data.token);
 
-      navigate("/select-service");
+      const decodedToken = jwtDecode(response.data.token);
+
+      console.log("Decoded Token", decodedToken);
+
+      if (decodedToken.role === "admin") {
+        navigate("/admin-panel");
+      } else {
+        navigate("/select-service");
+      }
     } catch (error) {
       if (error.response) {
         setError(error.response.data.message);

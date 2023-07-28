@@ -1,21 +1,17 @@
 import React, { useContext } from "react";
-import { Navigate, Route, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
 
-const ProtectedRoute = () => {
-  const navigate = useNavigate();
-  function ProtectedRoute(props) {
-    const { auth } = useContext(AuthContext);
+function ProtectedRoute({ element, ...rest }) {
+  const { auth } = useContext(AuthContext);
 
-    //IF the user is authenticated, render the routes component
-
-    if (auth) return <Route {...props} />;
-
-    //Otherwise, redirect to the login page
-    return navigate("/booking/login");
+  // If the user is authenticated, return the protected element
+  if (auth) {
+    return element;
   }
 
-  return <div>ProtectedRoute</div>;
-};
+  // Otherwise, redirect to the login page
+  return <Navigate to="/booking/login" />;
+}
 
 export default ProtectedRoute;
