@@ -17,7 +17,7 @@ const BookingSummary = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
+      console.log("Test Log .....");
       navigate("/confirmation");
     } catch (error) {
       console.error("Error creating booking", error);

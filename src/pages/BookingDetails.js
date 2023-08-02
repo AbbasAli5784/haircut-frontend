@@ -30,6 +30,9 @@ const BookingDetails = () => {
       user: { name: name, phone: phone },
     };
 
+    console.log("Booking Date:", bookingData);
+    console.log("Formatted date:", formattedDate);
+
     // Navigate to the summary page, passing along the booking data
     navigate("/booking-summary", { state: { bookingData } });
   };

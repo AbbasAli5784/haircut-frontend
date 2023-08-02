@@ -18,38 +18,38 @@ function TimeSlotsPage() {
     location.state.selectedService
   );
 
-  const timeSlots = [];
-  for (let i = 9; i < 17; i++) {
-    const formattedTime = moment({ hour: i }).format("hh:00A");
-    timeSlots.push(formattedTime);
-  }
+  const [timeSlots, setTimeSlots] = useState([]); // modified this line
 
-  const getBookedTimeSlots = async (date) => {
+  const getTimeSlots = async (date) => {
+    // modified this function
     try {
       const timezone = "America/New_York";
       const convertedDate = moment(date).tz(timezone).format("YYYY-MM-DD");
-      console.log("Selected date:", date);
-      console.log("Converted date:", convertedDate);
       const response = await axios.get(
-        `http://localhost:3001/api/bookings/date/${convertedDate}`
+        `http://localhost:3001/api/timeslots/date/${convertedDate}`
       );
       const data = response.data;
-      console.log("Data:", data);
-      const bookedTimes = data.map((booking) => {
-        console.log("Booking time:", booking);
-        const formattedTime = moment(booking, "hh:mma").format("hh:00A");
-        console.log("Formatted time:", formattedTime);
-
-        return formattedTime;
+      console.log("Data returned", data);
+      // const times = data.map((ts) => moment(ts.date).format("hh:00A"));
+      const times = data;
+      times.forEach((element) => {
+        element.formattedTime = moment(element.date).format("hh:00A");
       });
+
+      const bookedTimes = data
+        .filter((ts) => ts.status === "available")
+        .map((ts) => moment(ts.date).format("hh:00A"));
+      setTimeSlots(times);
+      console.log("Times:", times);
+
       setBookedTimeSlots(bookedTimes);
     } catch (error) {
-      console.error("Error fetching booked time slots:", error);
+      console.error("Error fetching time slots:", error);
     }
   };
 
   useEffect(() => {
-    getBookedTimeSlots(selectedDate);
+    getTimeSlots(selectedDate); // modified this line
   }, [selectedDate]);
 
   useEffect(() => {
@@ -60,6 +60,7 @@ function TimeSlotsPage() {
     console.log("Selected Time Slot:", time);
     console.log("Booked time slots:", bookedTimeSlots);
     console.log("Is time slot booked:", bookedTimeSlots.includes(time));
+    const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
 
     navigate("/booking-details", {
       state: {
@@ -70,6 +71,7 @@ function TimeSlotsPage() {
     });
 
     console.log("location state 3:", location.state);
+    console.log("Formatted Date: ", selectedDate);
   };
 
   return (
@@ -87,17 +89,17 @@ function TimeSlotsPage() {
             </div>
             <ul className="mt-5 space-y-4">
               {timeSlots.map((timeSlot) => (
-                <li key={timeSlot} className="rounded-md shadow-sm">
+                <li key={timeSlot.date} className="rounded-md shadow-sm">
                   <button
-                    onClick={() => handleTimeSlotClick(timeSlot)}
+                    onClick={() => handleTimeSlotClick(timeSlot.time)}
                     className={`${
-                      bookedTimeSlots.includes(timeSlot)
+                      timeSlot.status == "blocked"
                         ? "bg-gray-300"
                         : "bg-indigo-600 hover:bg-indigo-700"
                     } w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-                    disabled={bookedTimeSlots.includes(timeSlot)}
+                    disabled={timeSlot.status == "blocked"}
                   >
-                    {timeSlot}
+                    {timeSlot.time}
                   </button>
                 </li>
               ))}

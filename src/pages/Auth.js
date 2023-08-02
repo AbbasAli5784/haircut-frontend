@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GoogleLogin } from "@react-oauth/google";
+// import { GoogleLogin } from "@react-oauth/google";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { motion } from "framer-motion";
@@ -57,7 +57,7 @@ const Auth = () => {
                   Sign Up
                 </button>
 
-                <GoogleLogin
+                {/* <GoogleLogin
                   logo_alignment="center"
                   width="50"
                   onSuccess={(credentialResponse) => {
@@ -73,9 +73,9 @@ const Auth = () => {
                   onError={() => {
                     console.log("Login Failed");
                   }}
-                  
-                  
-                />
+                /> */}
+
+                
               </div>
             </center>
           </div>

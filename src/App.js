@@ -15,6 +15,7 @@ import Auth from "./pages/Auth";
 import { AuthProvider } from "./components/context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminPanel from "./components/AdminPanel";
+import DeleteAppointment from "./components/DeleteAppointment";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/admin-panel" element={<AdminPanel />} />
+          <Route path="/delete-appointment" element={<DeleteAppointment />} />
           <Route
             path="/select-service"
             element={<ProtectedRoute element={<SelectService />} />}

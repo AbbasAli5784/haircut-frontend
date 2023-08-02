@@ -44,13 +44,15 @@ const BookingPage = () => {
     // Convert the selected date to the "America/New_York" timezone
     const dateInNyTime = moment(date).tz("America/New_York");
 
+    const formattedDate = dateInNyTime.format("YYYY-MM-DD");
+
     // Update the selected date state
-    setSelectedDate(dateInNyTime);
+    setSelectedDate(formattedDate);
 
     // Navigate to "/time-slots" and pass along the selected date and service in the location state
     navigate("/time-slots", {
       state: {
-        selectedDate: dateInNyTime.toISOString(),
+        selectedDate: formattedDate,
         selectedService: selectedService,
       },
     });
