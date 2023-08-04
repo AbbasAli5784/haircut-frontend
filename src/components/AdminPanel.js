@@ -21,7 +21,7 @@ const AdminPanel = () => {
   //   timeSlots.push(formattedTime);
   // }
 
-  const navigateDeletePage = () => {
+  const manageAppointments = () => {
     navigate("/delete-appointment");
   };
 
@@ -184,7 +184,7 @@ const AdminPanel = () => {
       <ul>
         <div>{renderTimeSlots()}</div>
       </ul>
-      <button onClick={navigateDeletePage}>Delete Appointment</button>
+      <button onClick={manageAppointments}>Manage Appointments</button>
     </div>
   );
 };

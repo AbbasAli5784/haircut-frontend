@@ -14,6 +14,7 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./components/context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import AdminPanel from "./components/AdminPanel";
 import DeleteAppointment from "./components/DeleteAppointment";
 
@@ -26,8 +27,14 @@ function App() {
           <Route path="/booking/login" element={<Auth />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/admin-panel" element={<AdminPanel />} />
-          <Route path="/delete-appointment" element={<DeleteAppointment />} />
+          <Route
+            path="/admin-panel"
+            element={<ProtectedAdminRoute element={<AdminPanel />} />}
+          />
+          <Route
+            path="/delete-appointment"
+            element={<ProtectedAdminRoute element={<DeleteAppointment />} />}
+          />
           <Route
             path="/select-service"
             element={<ProtectedRoute element={<SelectService />} />}

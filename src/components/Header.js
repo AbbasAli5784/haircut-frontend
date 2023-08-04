@@ -3,14 +3,26 @@ import logo from "./logo/black.jpg";
 import { SocialIcon } from "react-social-icons";
 import { motion } from "framer-motion";
 import "./global.css";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const home = () => {
+    navigate("/");
+  };
   const [isOpen, setIsOpen] = useState(false);
   return (
     <header className="w-full bg-white py-4 px-6 shadow-md animate-fadeInDown">
       <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 ">
         <div className="flex items-center">
-          <img href="/" src={logo} alt="Company Logo" className="h-12 mr-4" />
+          <img
+            href="/"
+            src={logo}
+            alt="Company Logo"
+            className="h-12 mr-4"
+            onClick={home}
+          />
           <SocialIcon
             network="instagram"
             bgColor="##0a0a0a"
@@ -50,6 +62,7 @@ const Header = () => {
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   role="menuitem"
+                  onClick={home}
                 >
                   Home
                 </a>
