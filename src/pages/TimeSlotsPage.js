@@ -18,7 +18,7 @@ function TimeSlotsPage() {
     location.state.selectedService
   );
 
-  const [timeSlots, setTimeSlots] = useState([]); // modified this line
+  const [timeSlots, setTimeSlots] = useState([]);
 
   const getTimeSlots = async (date) => {
     // modified this function
@@ -29,6 +29,7 @@ function TimeSlotsPage() {
         `http://localhost:3001/api/timeslots/date/${convertedDate}`
       );
       const data = response.data;
+      console.log("Formatted Date", convertedDate);
       console.log("Data returned", data);
       // const times = data.map((ts) => moment(ts.date).format("hh:00A"));
       const times = data;

@@ -14,58 +14,53 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const DeleteAppointment = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [timeSlots, setTimeSlots] = useState([]);
+const UpdateBooking = () => {
+  const [bookings, setBookings] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [newDate, setNewDate] = useState(null);
   const [newTime, setNewTime] = useState("");
   const [newUserName, setNewUserName] = useState("");
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
   const [newService, setNewService] = useState("");
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [timeSlots, setTimeSlots] = useState([]);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    Modal.setAppElement("#root");
-  }, []);
+  // useEffect(() => {
+  //   const times = [];
+  //   for (let i = 9; i < 17; i++) {
+  //     const formattedTime = moment({ hour: i }).format("hh:mmA");
+  //     times.push(formattedTime);
+  //   }
+  //   setTimeSlots(times);
+  // }, []);
+  const getBookings = async (event) => {
+    const response = await axios.get(
+      "http://localhost:3001/api/bookings/mybookings",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the session token in the request
+        },
+      }
+    );
+    const data = await response.data;
+    setBookings(data);
 
-  useEffect(() => {
-    const times = [];
-    for (let i = 9; i < 17; i++) {
-      const formattedTime = moment({ hour: i }).format("hh:mmA");
-      times.push(formattedTime);
-    }
-    setTimeSlots(times);
-  }, []);
-
-  const fetchAppointments = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:3001/api/bookings/booked"
-      );
-      setAppointments(response.data.data);
-    } catch (err) {
-      console.error(err);
-    }
+    console.log("Bookings Data:", bookings);
   };
 
   const deleteAppointment = async () => {
     try {
       await axios.delete(`http://localhost:3001/api/bookings/${selectedUser}`);
       setSelectedUser(null);
-      setModalIsOpen(false);
-      fetchAppointments();
+      setIsDeleteModalOpen(false);
+      getBookings();
     } catch (err) {
-      console.error(err);
+      console.error("Error:", err);
     }
   };
-
-  // const fetchTimeSlots = async () => {
-  //   const response = await axios.get("http://localhost:3001/api/timeslots/");
-  //   setTimeSlots(response.data.data);
-  // };
-
   const adjustDate = (date, time) => {
     // Parse date as a moment object and time as a string
     const datetime = moment(date).format("YYYY-MM-DD") + " " + time;
@@ -93,32 +88,47 @@ const DeleteAppointment = () => {
       payload.date = adjustedDate;
       payload.time = newTime;
     }
-    else{
-      alert("You Must Enter A Date And Time Together ")
-    }
 
     try {
       const response = await axios.put(
         `http://localhost:3001/api/bookings/${selectedUser}`,
         payload
       );
+
+      getBookings();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
+  const getTimeSlots = async (date) => {
+    try {
+      const timezone = "America/New_York";
+      const convertedDate = moment(date).tz(timezone).format("YYYY-MM-DD");
+      const response = await axios.get(
+        `http://localhost:3001/api/timeslots/date/${convertedDate}`
+      );
+      const data = response.data;
 
+      const availableTimes = data
+        .filter((slot) => slot.status !== "blocked" && !slot.booked)
+        .map((slot) => slot.time);
+
+      setTimeSlots(availableTimes);
+    } catch (error) {
+      console.error("Error fetching time slots:", error);
+    }
+  };
   useEffect(() => {
-    fetchAppointments();
+    getTimeSlots(newDate);
+  }, [newDate]);
+  useEffect(() => {
+    getBookings();
   }, []);
 
   return (
     <>
       <Header />
-
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-md">
           <div className="flex items-center justify-center text-center">
@@ -127,45 +137,41 @@ const DeleteAppointment = () => {
             </h2>
             <CalendarMonthIcon />
           </div>
-
           <ul className="mt-5 space-y-4">
-            {appointments.map((appointment) => (
-              <li key={appointment._id} className="rounded-md shadow-sm">
+            {bookings.map((booking) => (
+              <li key={booking._id} className="rounded-md shadow-sm">
                 <div
                   className="w-full flex flex-col items-center justify-center px-2 py-1 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none transition duration-500 ease-in-out transform hover:scale-105"
                   onClick={() =>
                     setSelectedUser(
-                      selectedUser === appointment._id ? null : appointment._id
+                      selectedUser === booking._id ? null : booking._id
                     )
                   }
                 >
-                  <div className="flex justify-end items-center space-x-2">
-                    <PersonIcon />
-                    <span>{appointment.user.name}</span>
-                  </div>
-
+                  <PersonIcon />
+                  {booking.user.name}
                   <IconButton>
                     <ExpandMoreIcon />
                   </IconButton>
                 </div>
-                {selectedUser === appointment._id && (
-                  <div className="px-4 py-3 bg-gray-100  ">
-                    <p>
-                      Date: {new Date(appointment.date).toLocaleDateString()}
-                    </p>
-                    <p>Time: {appointment.time}</p>
-                    <p>Phone Number: {appointment.user.phone}</p>
-                    <p>Service: {appointment.service}</p>
-                    <div className="flex justify-between items-end">
+
+                {console.log("Selected User:", selectedUser)}
+                {selectedUser === booking._id && (
+                  <div className="flex flex-col justify-center items-center px-4 py-3 bg-gray-100">
+                    <p>Service: {booking.service}</p>
+                    <p>Date: {new Date(booking.date).toLocaleDateString()}</p>
+                    <p>Time: {booking.time}</p>
+                    <p>Phone: {booking.user.phone}</p>
+                    <div className="flex flex-row space-x-4">
                       <button
                         className="bg-red-500 text-white px-1 py-1 rounded hover:bg-red-600"
                         onClick={() => setIsDeleteModalOpen(true)}
                       >
-                        Delete Appointment
+                        Cancel Appointment
                       </button>
                       <button
-                        className="bg-indigo-500 text-white px-2 py-1 rounded hover:bg-indigo-600"
-                        onClick={openModal}
+                        className="bg-indigo-500 text-white px-1 py-1 rounded hover:bg-indigo-600"
+                        onClick={() => setModalIsOpen(true)}
                       >
                         Update Appointment
                       </button>
@@ -256,6 +262,7 @@ const DeleteAppointment = () => {
                 placeholderText="Select a Date"
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               />
+              {console.log("New Date:", newDate)}
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -317,7 +324,10 @@ const DeleteAppointment = () => {
                 Yes
               </button>
               <button
-                onClick={() => setIsDeleteModalOpen(false)}
+                onClick={(event) => {
+                  event.stopPropagation(); // Prevents the click event from being triggered on the div
+                  setIsDeleteModalOpen(false);
+                }}
                 className="bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 flex justify-center"
               >
                 No
@@ -330,4 +340,4 @@ const DeleteAppointment = () => {
   );
 };
 
-export default DeleteAppointment;
+export default UpdateBooking;

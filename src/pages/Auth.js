@@ -74,8 +74,6 @@ const Auth = () => {
                     console.log("Login Failed");
                   }}
                 /> */}
-
-                
               </div>
             </center>
           </div>

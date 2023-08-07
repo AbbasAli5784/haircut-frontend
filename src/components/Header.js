@@ -11,6 +11,14 @@ const Header = () => {
   const home = () => {
     navigate("/");
   };
+  const updateBooking = () => {
+    navigate("/update-booking");
+  };
+
+  const logOut = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
   const [isOpen, setIsOpen] = useState(false);
   return (
     <header className="w-full bg-white py-4 px-6 shadow-md animate-fadeInDown">
@@ -70,8 +78,18 @@ const Header = () => {
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   role="menuitem"
+                  onClick={updateBooking}
                 >
-                  Contact
+                  Update Booking
+                </a>
+
+                <a
+                  href="#"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  role="menuitem"
+                  onClick={logOut}
+                >
+                  Logout
                 </a>
               </div>
             </div>

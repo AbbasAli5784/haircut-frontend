@@ -129,63 +129,72 @@ const AdminPanel = () => {
   };
 
   const renderTimeSlot = (time) => {
-    // Convert the formattedTime back to 24-hour format to match the time value in the blockedTimeSlots array
-    // const timeIn24HourFormat = moment(formattedTime, "hh:mmA").format("HH:mm");
-    // const timeIn12HourFormat = moment(timeIn24HourFormat, "HH:mm").format(
-    //   "hh:mm A"
-    // );
-    // Find the timeslot object that corresponds to this time
-
     const timeslot = blockedTimeSlots.find(
       (timeslot) => timeslot.time === time
     );
-    // console.log("Time Slot:", timeslot);
-    // console.log("TIme in 12:00hours", timeIn12HourFormat);
-    // If there is no such timeslot, it means this time is not blocked
-    const isBlocked = !!timeslot;
+
+    const isBlocked = timeslot ? timeslot.status === "blocked" : false;
+    const isDisabled =
+      timeslot?.booked === true && timeslot?.status === "blocked";
+    
 
     return (
-      // key={time}
-      // className={`list-group-item ${
-      //   isBlocked ? "list-group-item-danger" : ""
-      // }`}
-      // onClick={() => handleTimeSlotClick(timeslot)}
-      // disabled={time.booked === true}
-
-      <li key={time}>
+      <li key={time} className="list-none">
         <button
-          // className="bg-indigo-600 hover:bg-indigo-700"
-          // type="button"
-          // style={{ backgroundColor: "blue" }}
-          // className={`list-group-item ${
-          //   isBlocked ? "list-group-item-danger" : ""
-          // }`}
           onClick={() => handleTimeSlotClick(timeslot)}
-          disabled={time.booked === true}
+          disabled={isDisabled}
+          style={
+            isDisabled
+              ? { opacity: 0.2, cursor: "not-allowed", hover: "none" }
+              : {}
+          }
+          className={`px-4 py-2 text-white rounded-md mt-2 w-full text-center ${
+            isBlocked
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-green-600 hover:bg-green-700"
+          } focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            isBlocked ? "focus:ring-red-500" : "focus:ring-green-500"
+          }`}
         >
           {time}
         </button>
       </li>
     );
   };
-
-  const renderTimeSlots = () => {
-    return timeSlots.map((timeSlot) => renderTimeSlot(timeSlot));
-  };
-
   return (
-    <div>
+    <>
       <Header title="Admin Panel" />
-      <DatePicker
-        selected={selectedDate}
-        onChange={(date) => handleDateChange(date)}
-        inline
-      />
-      <ul>
-        <div>{renderTimeSlots()}</div>
-      </ul>
-      <button onClick={manageAppointments}>Manage Appointments</button>
-    </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-md">
+          <div className="flex items-center justify-center mt-6 text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900 mr-4 -mt-2 ">
+              Time Managment
+            </h2>
+            {/* Assuming Clock is a valid image or component */}
+            {/* <img src={Clock} alt="Clock" className="h-10 w-10 -ml-3" /> */}
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => handleDateChange(date)}
+              inline
+              className="shadow rounded-lg text-center items-center justify-center"
+            />
+          </div>
+          <ul className="mt-6 space-y-4">
+            {timeSlots.map((time) => renderTimeSlot(time))}
+          </ul>
+          <div className="flex flex-col items-center justify-center">
+            <button
+              onClick={manageAppointments}
+              className="items-center justify-center mt-6 px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Manage Appointments
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

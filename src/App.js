@@ -17,6 +17,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import AdminPanel from "./components/AdminPanel";
 import DeleteAppointment from "./components/DeleteAppointment";
+import UpdateBooking from "./pages/UpdateBooking";
+import { Update } from "@mui/icons-material";
 
 function App() {
   return (
@@ -27,6 +29,10 @@ function App() {
           <Route path="/booking/login" element={<Auth />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/update-booking"
+            element={<ProtectedRoute element={<UpdateBooking />} />}
+          />
           <Route
             path="/admin-panel"
             element={<ProtectedAdminRoute element={<AdminPanel />} />}

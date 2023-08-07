@@ -12,6 +12,10 @@ const SelectService = () => {
 
   const navigate = useNavigate();
 
+  const testFunction = () => {
+    navigate("/update-booking");
+  };
+
   const handleServiceClick = (service) => {
     console.log("Selected Service:", service);
 
@@ -53,6 +57,7 @@ const SelectService = () => {
                   >
                     {service.name}
                   </button>
+                  
                 </li>
               ))}
             </ul>

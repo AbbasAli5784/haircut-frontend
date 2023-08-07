@@ -9,19 +9,22 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    const decodedToken = jwtDecode(token);
-
-    console.log("Decoded Token AuthContext:", decodedToken.admin);
-
-    //If there is a token in local storage, the user is autneticated
-
     if (token) {
-      setAuth(true);
-      if (decodedToken.role === "admin") {
-        setAdmin(true);
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log("Decoded Token AuthContext:", decodedToken.admin);
+
+        setAuth(true);
+        if (decodedToken.role === "admin") {
+          setAdmin(true);
+        }
+      } catch (error) {
+        console.error("Failed to decode token", error);
       }
     }
   }, []);
+
+  //If there is a token in local storage, the user is autneticated
 
   return (
     <AuthContext.Provider value={{ auth, setAuth, admin, setAdmin }}>

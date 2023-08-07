@@ -11,7 +11,7 @@ function ProtectedAdminRoute({ element, ...rest }) {
   }
 
   // Otherwise, redirect to the login page
-  return <Navigate to="/booking/login" />;
+  return <Navigate to="/admin-panel" />;
 }
 
 export default ProtectedAdminRoute;
