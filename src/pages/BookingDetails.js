@@ -1,40 +1,66 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
 import Header from "../components/Header";
+import { TextField } from "@mui/material";
 const moment = require("moment");
 
 const BookingDetails = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const location = useLocation();
   const { selectedService, selectedDate, time } = location.state;
   const navigate = useNavigate();
 
+  const validateInputs = () => {
+    let isValid = true;
+    if (!name) {
+      setNameError("Please Enter A Name!");
+      isValid = false;
+    } else {
+      setNameError("");
+    }
+    if (!phone) {
+      setPhoneError("Please Enter A  Valid Phone Number!");
+      isValid = false;
+    } else {
+      setPhoneError("");
+    }
+    if (phone.length < 10) {
+      setPhoneError("Please enter a phone number with a minimum of 10 digits.");
+      isValid = false;
+    } else {
+      setPhoneError("");
+    }
+    return isValid;
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    const isValid = validateInputs();
     // Prepare booking data, but don't send it yet.
-    const timezone = "America/New_York";
-    const dateWithTime = moment.tz(
-      selectedDate.split("T")[0] + " " + time,
-      "YYYY-MM-DD hh:mma",
-      timezone
-    );
-    const formattedDate = dateWithTime.toISOString();
+    if (isValid) {
+      const combinedDateTime = `${selectedDate.split("T")[0]} ${time}`;
 
-    const bookingData = {
-      service: selectedService.name,
-      date: formattedDate,
-      time: time,
-      user: { name: name, phone: phone },
-    };
+      // Convert the combined date and time to UTC
+      const dateWithTime = moment.utc(combinedDateTime, "YYYY-MM-DD hh:mma");
 
-    console.log("Booking Date:", bookingData);
-    console.log("Formatted date:", formattedDate);
+      // Format the UTC date
+      const formattedDate = dateWithTime.format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
-    // Navigate to the summary page, passing along the booking data
-    navigate("/booking-summary", { state: { bookingData } });
+      const bookingData = {
+        service: selectedService.name,
+        date: formattedDate,
+        time: time,
+        user: { name: name, phone: phone },
+      };
+
+      // Navigate to the summary page, passing along the booking data
+      navigate("/booking-summary", {
+        state: { bookingData, selectedService, selectedDate, time },
+      });
+    }
   };
 
   return (
@@ -52,30 +78,32 @@ const BookingDetails = () => {
                 <label htmlFor="name" className="sr-only">
                   Name
                 </label>
-                <input
+                <TextField
                   id="name"
-                  name="name"
+                  label="Name"
                   type="text"
-                  required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  error={!!nameError}
+                  helperText={nameError}
                 />
               </div>
               <div>
                 <label htmlFor="phone" className="sr-only">
                   Phone
                 </label>
-                <input
+                <TextField
                   id="phone"
-                  name="phone"
+                  label="Phone"
                   type="tel"
-                  required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  error={!!phoneError}
+                  helperText={phoneError}
                 />
               </div>
             </div>

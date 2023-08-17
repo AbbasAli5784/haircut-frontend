@@ -4,15 +4,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import moment from "moment";
 import Header from "../components/Header";
-import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "react-modal";
 import { IconButton } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonIcon from "@mui/icons-material/Person";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Snackbar } from "@mui/material";
+import { Close } from "@mui/icons-material";
 
 const DeleteAppointment = () => {
   const [appointments, setAppointments] = useState([]);
@@ -25,19 +23,35 @@ const DeleteAppointment = () => {
   const [newService, setNewService] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     Modal.setAppElement("#root");
   }, []);
 
-  useEffect(() => {
-    const times = [];
-    for (let i = 9; i < 17; i++) {
-      const formattedTime = moment({ hour: i }).format("hh:mmA");
-      times.push(formattedTime);
+
+  const getTimeSlots = async (date) => {
+    try {
+      const timezone = "America/New_York";
+      const convertedDate = moment(date).tz(timezone).format("YYYY-MM-DD");
+      const response = await axios.get(
+        `http://localhost:3001/api/timeslots/date/${convertedDate}`
+      );
+      const data = response.data;
+
+      const availableTimes = data
+        .filter((slot) => slot.status !== "blocked" && !slot.booked)
+        .map((slot) => slot.time);
+
+      setTimeSlots(availableTimes);
+    } catch (error) {
+      console.error("Error fetching time slots:", error);
     }
-    setTimeSlots(times);
-  }, []);
+  };
+  useEffect(() => {
+    getTimeSlots(newDate);
+  }, [newDate]);
 
   const fetchAppointments = async () => {
     try {
@@ -54,27 +68,13 @@ const DeleteAppointment = () => {
     try {
       await axios.delete(`http://localhost:3001/api/bookings/${selectedUser}`);
       setSelectedUser(null);
-      setModalIsOpen(false);
+      setIsDeleteModalOpen(false);
+      setSnackbarMessage("Appointment Succesfully Deleted!");
+      setSnackbarOpen(true);
       fetchAppointments();
     } catch (err) {
       console.error(err);
     }
-  };
-
-  // const fetchTimeSlots = async () => {
-  //   const response = await axios.get("http://localhost:3001/api/timeslots/");
-  //   setTimeSlots(response.data.data);
-  // };
-
-  const adjustDate = (date, time) => {
-    // Parse date as a moment object and time as a string
-    const datetime = moment(date).format("YYYY-MM-DD") + " " + time;
-
-    // Create a single moment object
-    const momentDateTime = moment(datetime, "YYYY-MM-DD hh:mmA");
-
-    // Convert to UTC and format
-    return momentDateTime.utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
   };
 
   const updateBookingAndUser = async (event) => {
@@ -86,22 +86,21 @@ const DeleteAppointment = () => {
     };
 
     if (newDate && newTime) {
-      console.log("newDate:", newDate);
-      console.log("newTime:", newTime);
-      const adjustedDate = adjustDate(newDate, newTime);
-      console.log("Adjusted DateTime:", adjustedDate);
-      payload.date = adjustedDate;
+      const datetime = moment(newDate).format("YYYY-MM-DD") + " " + newTime;
+      const momentDateTime = moment(datetime, "YYYY-MM-DD hh:mmA");
+      payload.date = momentDateTime.format("YYYY-MM-DDTHH:mm:ss.SSS+00:00");
       payload.time = newTime;
-    }
-    else{
-      alert("You Must Enter A Date And Time Together ")
     }
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:3001/api/bookings/${selectedUser}`,
         payload
       );
+
+      setSnackbarMessage("Booking updated successfully!");
+      setSnackbarOpen(true);
+      fetchAppointments();
     } catch (err) {
       console.error(err);
     }
@@ -119,7 +118,7 @@ const DeleteAppointment = () => {
     <>
       <Header />
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 animate-slideInRight">
         <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-md">
           <div className="flex items-center justify-center text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 mr-4">
@@ -326,6 +325,28 @@ const DeleteAppointment = () => {
           </div>
         </Modal>
       </div>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+        action={
+          <React.Fragment>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={() => setSnackbarOpen(false)}
+            >
+              <Close fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
     </>
   );
 };

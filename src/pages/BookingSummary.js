@@ -1,30 +1,59 @@
-import React from "react";
+import { React, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import moment from "moment";
+import jwtDecode from "jwt-decode";
+// import moment from "moment";
+import moment from "moment-timezone";
 import Header from "../components/Header";
 
 const BookingSummary = () => {
   const location = useLocation();
   const { bookingData } = location.state;
+  const { selectedService, selectedDate, time } = location.state;
+  const [email, setEmail] = useState("");
+  // const { email, setEmail, isLoading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const decodedToken = jwtDecode(token);
 
   const handleConfirm = async () => {
+    console.log("Email:", email);
+
     try {
-      const token = localStorage.getItem("token");
       await axios.post("http://localhost:3001/api/bookings", bookingData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Test Log .....");
+
+      await axios.post(
+        "http://localhost:3001/api/bookings/booking-confirmation",
+        {
+          email: email,
+          service: selectedService.name,
+          date: selectedDate,
+          time: time,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       navigate("/confirmation");
     } catch (error) {
       console.error("Error creating booking", error);
     }
   };
 
-  const formattedDate = moment(bookingData.date).format("MMMM Do, YYYY");
+  useEffect(() => {
+    setEmail(decodedToken.userEmail);
+  }, []);
+  const timezone = "America/New_York";
+  const formattedDateForDisplay = moment
+    .tz(bookingData.date, timezone)
+    .format("MMMM Do, YYYY");
 
   return (
     <>
@@ -42,7 +71,7 @@ const BookingSummary = () => {
                 <strong>Service:</strong> {bookingData.service}
               </p>
               <p>
-                <strong>Date:</strong> {formattedDate}
+                <strong>Date:</strong> {formattedDateForDisplay}
               </p>
               <p>
                 <strong>Time:</strong> {bookingData.time}

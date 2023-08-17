@@ -1,6 +1,4 @@
-import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import Header from "./Header";
 
 const SelectService = () => {
@@ -12,12 +10,8 @@ const SelectService = () => {
 
   const navigate = useNavigate();
 
-  const testFunction = () => {
-    navigate("/update-booking");
-  };
-
   const handleServiceClick = (service) => {
-    console.log("Selected Service:", service);
+    
 
     setTimeout(() => {
       navigate(`/booking/${service.id}`, {
@@ -28,19 +22,8 @@ const SelectService = () => {
 
   return (
     <>
-      {/* <motion.div
-        initial={{ opacity: 0, x: "100vw" }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ type: "tween", ease: "anticipate", duration: 1 }}
-      > */}
       <Header />
-      {/* </motion.div> */}
-      {/* <motion.div
-        className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
-        initial={{ opacity: 0, x: "100vw" }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ type: "tween", ease: "anticipate", duration: 2 }}
-      > */}
+
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 animate-slideInRight">
         <div className=" max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-md">
           <div>
@@ -57,14 +40,13 @@ const SelectService = () => {
                   >
                     {service.name}
                   </button>
-                  
                 </li>
               ))}
             </ul>
           </div>
         </div>
       </div>
-      {/* </motion.div> */}
+      
     </>
   );
 };

@@ -2,32 +2,55 @@ import { createContext, useState, useEffect } from "react";
 import jwtDecode from "jwt-decode";
 
 export const AuthContext = createContext();
+
 export function AuthProvider({ children }) {
   const [auth, setAuth] = useState(false);
   const [admin, setAdmin] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  const checkTokenExpiration = () => {
+    const tokenFromStorage = localStorage.getItem("token");
+    if (tokenFromStorage) {
+      const decodedToken = jwtDecode(tokenFromStorage);
+      const currentTime = Date.now() / 1000;
 
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        console.log("Decoded Token AuthContext:", decodedToken.admin);
-
+      if (decodedToken.exp < currentTime) {
+        // Token has expired
+        localStorage.removeItem("token");
+        setAuth(false);
+        setAdmin(false);
+        setIsLoading(false);
+      } else {
+        if (decodedToken.userEmail !== email) {
+          setEmail(decodedToken.userEmail);
+        }
         setAuth(true);
+        setIsLoading(false);
+
         if (decodedToken.role === "admin") {
           setAdmin(true);
         }
-      } catch (error) {
-        console.error("Failed to decode token", error);
       }
+    } else {
+      setIsLoading(false);
     }
-  }, []);
+  };
 
-  //If there is a token in local storage, the user is autneticated
+  useEffect(() => {
+    checkTokenExpiration(); // Initial check
+
+    // Set up an interval to check token expiration every 10 minutes
+    const interval = setInterval(checkTokenExpiration, 600000); // 600000ms = 10 minutes
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, [email]); // Add email as a dependency
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth, admin, setAdmin }}>
+    <AuthContext.Provider
+      value={{ auth, setAuth, admin, setAdmin, email, setEmail }}
+    >
       {children}
     </AuthContext.Provider>
   );

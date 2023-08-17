@@ -4,15 +4,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import moment from "moment";
 import Header from "../components/Header";
-import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "react-modal";
 import { IconButton } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PersonIcon from "@mui/icons-material/Person";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Snackbar } from "@mui/material";
+import { Close } from "@mui/icons-material";
 
 const UpdateBooking = () => {
   const [bookings, setBookings] = useState([]);
@@ -25,17 +23,13 @@ const UpdateBooking = () => {
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
   const [newService, setNewService] = useState("");
   const [timeSlots, setTimeSlots] = useState([]);
-  const navigate = useNavigate();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const token = localStorage.getItem("token");
 
-  // useEffect(() => {
-  //   const times = [];
-  //   for (let i = 9; i < 17; i++) {
-  //     const formattedTime = moment({ hour: i }).format("hh:mmA");
-  //     times.push(formattedTime);
-  //   }
-  //   setTimeSlots(times);
-  // }, []);
+  useEffect(() => {
+    Modal.setAppElement("#root");
+  }, []);
   const getBookings = async (event) => {
     const response = await axios.get(
       "http://localhost:3001/api/bookings/mybookings",
@@ -47,8 +41,6 @@ const UpdateBooking = () => {
     );
     const data = await response.data;
     setBookings(data);
-
-    console.log("Bookings Data:", bookings);
   };
 
   const deleteAppointment = async () => {
@@ -56,20 +48,12 @@ const UpdateBooking = () => {
       await axios.delete(`http://localhost:3001/api/bookings/${selectedUser}`);
       setSelectedUser(null);
       setIsDeleteModalOpen(false);
+      setSnackbarMessage("Appointment Succesfully Cancelled!");
+      setSnackbarOpen(true);
       getBookings();
     } catch (err) {
       console.error("Error:", err);
     }
-  };
-  const adjustDate = (date, time) => {
-    // Parse date as a moment object and time as a string
-    const datetime = moment(date).format("YYYY-MM-DD") + " " + time;
-
-    // Create a single moment object
-    const momentDateTime = moment(datetime, "YYYY-MM-DD hh:mmA");
-
-    // Convert to UTC and format
-    return momentDateTime.utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
   };
 
   const updateBookingAndUser = async (event) => {
@@ -81,19 +65,19 @@ const UpdateBooking = () => {
     };
 
     if (newDate && newTime) {
-      console.log("newDate:", newDate);
-      console.log("newTime:", newTime);
-      const adjustedDate = adjustDate(newDate, newTime);
-      console.log("Adjusted DateTime:", adjustedDate);
-      payload.date = adjustedDate;
+      const datetime = moment(newDate).format("YYYY-MM-DD") + " " + newTime;
+      const momentDateTime = moment(datetime, "YYYY-MM-DD hh:mmA");
+      payload.date = momentDateTime.format("YYYY-MM-DDTHH:mm:ss.SSS+00:00");
       payload.time = newTime;
     }
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:3001/api/bookings/${selectedUser}`,
         payload
       );
+      setSnackbarMessage("Appointment Succesfully Updated!");
+      setSnackbarOpen(true);
 
       getBookings();
     } catch (err) {
@@ -129,7 +113,7 @@ const UpdateBooking = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 animate-slideInRight">
         <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-md">
           <div className="flex items-center justify-center text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 mr-4">
@@ -148,14 +132,16 @@ const UpdateBooking = () => {
                     )
                   }
                 >
-                  <PersonIcon />
-                  {booking.user.name}
+                  <div className="flex justify-end items-center space-x-2">
+                    <PersonIcon />
+                    <span>{booking.user.name}</span>
+                  </div>
+
                   <IconButton>
                     <ExpandMoreIcon />
                   </IconButton>
                 </div>
 
-                {console.log("Selected User:", selectedUser)}
                 {selectedUser === booking._id && (
                   <div className="flex flex-col justify-center items-center px-4 py-3 bg-gray-100">
                     <p>Service: {booking.service}</p>
@@ -262,7 +248,6 @@ const UpdateBooking = () => {
                 placeholderText="Select a Date"
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               />
-              {console.log("New Date:", newDate)}
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -314,7 +299,7 @@ const UpdateBooking = () => {
         >
           <div className="flex flex-col items-center space-y-4">
             <h2 className="text-2xl font-bold text-red-600 mb-6">
-              Are you sure you want to delete this appointment?
+              Are you sure you want to cancel this appointment?
             </h2>
             <div className="flex justify-center items-end">
               <button
@@ -336,6 +321,28 @@ const UpdateBooking = () => {
           </div>
         </Modal>
       </div>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+        action={
+          <React.Fragment>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={() => setSnackbarOpen(false)}
+            >
+              <Close fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
     </>
   );
 };

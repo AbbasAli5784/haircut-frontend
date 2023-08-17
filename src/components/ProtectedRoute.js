@@ -8,10 +8,10 @@ function ProtectedRoute({ element, ...rest }) {
   // If the user is authenticated, return the protected element
   if (auth) {
     return element;
+  } else {
+    // Otherwise, redirect to the login page
+    return <Navigate to="/booking/login" />;
   }
-
-  // Otherwise, redirect to the login page
-  return <Navigate to="/booking/login" />;
 }
 
 export default ProtectedRoute;

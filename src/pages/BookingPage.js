@@ -18,7 +18,7 @@ const BookingPage = () => {
       const response = await axios.get(
         "http://localhost:3001/api/bookings/fully-booked-dates"
       );
-      console.log("Response Data", response.data);
+     
 
       // Update the fully booked dates state with fetched data
       setFullyBookedDates(response.data);

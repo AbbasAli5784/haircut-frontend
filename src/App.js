@@ -1,4 +1,5 @@
 import React from "react";
+
 import HomePage from "./pages/HomePage";
 import BookingPage from "./pages/BookingPage";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -10,7 +11,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import BookingSummary from "./pages/BookingSummary";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+// import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./components/context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -18,12 +19,15 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import AdminPanel from "./components/AdminPanel";
 import DeleteAppointment from "./components/DeleteAppointment";
 import UpdateBooking from "./pages/UpdateBooking";
-import { Update } from "@mui/icons-material";
+import AuthRedirect from "./components/AuthRedirect";
+
+// import { Update } from "@mui/icons-material";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <AuthRedirect />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/booking/login" element={<Auth />} />
@@ -53,10 +57,7 @@ function App() {
             path="/booking/:serviceID"
             element={<ProtectedRoute element={<BookingPage />} />}
           />
-          <Route
-            path="/forgot-password"
-            element={<ProtectedRoute element={<ForgotPassword />} />}
-          />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route
             path="/booking-details"
             element={<ProtectedRoute element={<BookingDetails />} />}

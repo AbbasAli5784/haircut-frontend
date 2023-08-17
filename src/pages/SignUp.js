@@ -1,35 +1,76 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/Header";
+import { TextField } from "@mui/material";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const validateInputs = () => {
+    let isValid = true;
+
+    if (!username) {
+      setUsernameError("Username is required");
+      isValid = false;
+    } else {
+      setUsernameError("");
+    }
+
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Valid email is required");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password || password.length < 6) {
+      setPasswordError("Password should be at least 6 characters!");
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    return isValid;
+  };
 
   const handleSignup = async (event) => {
     event.preventDefault();
 
-    try {
-      const { selectedService, selectedDate, time } = location.state || {}; // Access state here
-      await axios.post("http://localhost:3001/api/users/register", {
-        username,
-        email,
-        password,
-      });
-      console.log("User succesfully registered");
+    // Validate the inputs
+    const isValid = validateInputs();
 
-      // Redirect user to the homepage after successful signup
-      // navigate("/booking/login", {
-      //   state: { selectedService, selectedDate, time },
-      // });
+    if (isValid) {
+      try {
+        await axios.post("http://localhost:3001/api/users/register", {
+          username,
+          email,
+          password,
+        });
 
-      navigate("/booking/login");
-    } catch (error) {
-      console.error(error);
+        navigate("/booking/login");
+      } catch (error) {
+        if (
+          error.response ||
+          error.response.data.message === "Email already in use"
+        ) {
+          setEmailError("Email already in use");
+        }
+        if (
+          error.response ||
+          error.response.data.message === "Username already exists!"
+        ) {
+          setUsernameError("Username already exists!");
+        } else {
+          console.error(error);
+        }
+      }
     }
   };
 
@@ -50,47 +91,48 @@ const Signup = () => {
                 <label htmlFor="username" className="sr-only">
                   Username
                 </label>
-                <input
+                <TextField
                   id="username"
-                  name="username"
+                  label="Username"
                   type="text"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Username"
+                  fullWidth
+                  variant="outlined"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  error={!!usernameError}
+                  helperText={usernameError}
                 />
               </div>
               <div>
                 <label htmlFor="email-address" className="sr-only">
                   Email address
                 </label>
-                <input
+                <TextField
                   id="email-address"
-                  name="email"
+                  label="Email Address"
                   type="email"
-                  autoComplete="email"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Email address"
+                  fullWidth
+                  variant="outlined"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  error={!!emailError}
+                  helperText={emailError}
                 />
               </div>
               <div>
                 <label htmlFor="password" className="sr-only">
                   Password
                 </label>
-                <input
+                <TextField
                   id="password"
-                  name="password"
+                  label="Password"
                   type="password"
-                  autoComplete="current-password"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Password"
+                  fullWidth
+                  variant="outlined"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  error={!!passwordError}
+                  helperText={passwordError}
                 />
               </div>
             </div>

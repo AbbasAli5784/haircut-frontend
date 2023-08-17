@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect } from "react";
 // import { GoogleLogin } from "@react-oauth/google";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { motion } from "framer-motion";
 
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { selectedService, selectedDate, time } = location.state || {};
 
-  const [account, setAccount] = useState(null);
+  // const [account, setAccount] = useState(null);
 
   const handleLoginClick = () => {
     navigate("/login", { state: { selectedService, selectedDate, time } });
@@ -19,17 +18,17 @@ const Auth = () => {
     navigate("/signup", { state: { selectedService, selectedDate, time } });
   };
 
-  const responseGoogle = (response) => {
-    if (response) {
-      setAccount(response);
-    } else {
-      console.log("No profileObj found in the response");
-    }
-  };
+  // const responseGoogle = (response) => {
+  //   if (response) {
+  //     setAccount(response);
+  //   } else {
+  //     console.log("No profileObj found in the response");
+  //   }
+  // };
 
-  useEffect(() => {
-    console.log("Account:", account);
-  }, [account]);
+  // useEffect(() => {
+  //   console.log("Account:", account);
+  // }, [account]);
 
   return (
     <>

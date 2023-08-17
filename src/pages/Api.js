@@ -11,12 +11,10 @@ export function getApi() {
   api.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem("token");
-      console.log("Intercepted token: ", token);
 
       if (token) {
         config.headers.authorization = `Bearer ${token}`;
       }
-      console.log("Request headers after intercepting: ", config);
 
       return config;
     },

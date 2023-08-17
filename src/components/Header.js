@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import logo from "./logo/black.jpg";
 import { SocialIcon } from "react-social-icons";
-import { motion } from "framer-motion";
 import "./global.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "./context/AuthContext";
+import { useContext } from "react";
 
 const Header = () => {
+  const { auth, admin } = useContext(AuthContext);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  // const decode = jwtDecode("token");
 
   const home = () => {
     navigate("/");
@@ -15,13 +20,17 @@ const Header = () => {
     navigate("/update-booking");
   };
 
+  const adminPanel = () => {
+    navigate("/admin-panel");
+  };
+
   const logOut = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <header className="w-full bg-white py-4 px-6 shadow-md animate-fadeInDown">
+    <header className="w-full bg-white py-4 px-6 shadow-md ">
       <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 ">
         <div className="flex items-center">
           <img
@@ -67,30 +76,44 @@ const Header = () => {
                 aria-labelledby="user-menu"
               >
                 <a
-                  href="#"
+                  href="/"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   role="menuitem"
                   onClick={home}
                 >
                   Home
                 </a>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  role="menuitem"
-                  onClick={updateBooking}
-                >
-                  Update Booking
-                </a>
+                {auth && (
+                  <a
+                    href="##"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                    onClick={updateBooking}
+                  >
+                    Update Booking
+                  </a>
+                )}
 
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  role="menuitem"
-                  onClick={logOut}
-                >
-                  Logout
-                </a>
+                {admin && (
+                  <a
+                    href="##"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                    onClick={adminPanel}
+                  >
+                    Admin Panel
+                  </a>
+                )}
+                {token && (
+                  <a
+                    href="/"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                    onClick={logOut}
+                  >
+                    Logout
+                  </a>
+                )}
               </div>
             </div>
           )}

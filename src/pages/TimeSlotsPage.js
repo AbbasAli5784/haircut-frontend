@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../TimeSlotsPage.css";
@@ -11,15 +11,18 @@ import Header from "../components/Header";
 
 function TimeSlotsPage() {
   const location = useLocation();
-  const [selectedDate, setSelectedDate] = useState(location.state.selectedDate);
+  const [selectedDate] = useState(location.state.selectedDate);
   const [bookedTimeSlots, setBookedTimeSlots] = useState([]);
   const navigate = useNavigate();
-  const [selectedService, setSelectedService] = useState(
-    location.state.selectedService
-  );
+  const [selectedService] = useState(location.state.selectedService);
 
   const [timeSlots, setTimeSlots] = useState([]);
 
+  const backClick = () => {
+    navigate(`/booking/${selectedService.id}`, {
+      state: { selectedService: selectedService },
+    });
+  };
   const getTimeSlots = async (date) => {
     // modified this function
     try {
@@ -29,8 +32,7 @@ function TimeSlotsPage() {
         `http://localhost:3001/api/timeslots/date/${convertedDate}`
       );
       const data = response.data;
-      console.log("Formatted Date", convertedDate);
-      console.log("Data returned", data);
+
       // const times = data.map((ts) => moment(ts.date).format("hh:00A"));
       const times = data;
       times.forEach((element) => {
@@ -41,7 +43,6 @@ function TimeSlotsPage() {
         .filter((ts) => ts.status === "available")
         .map((ts) => moment(ts.date).format("hh:00A"));
       setTimeSlots(times);
-      console.log("Times:", times);
 
       setBookedTimeSlots(bookedTimes);
     } catch (error) {
@@ -53,15 +54,10 @@ function TimeSlotsPage() {
     getTimeSlots(selectedDate); // modified this line
   }, [selectedDate]);
 
-  useEffect(() => {
-    console.log("Booked time slots:", bookedTimeSlots);
-  }, [bookedTimeSlots]);
+  useEffect(() => {}, [bookedTimeSlots]);
 
   const handleTimeSlotClick = async (time) => {
-    console.log("Selected Time Slot:", time);
-    console.log("Booked time slots:", bookedTimeSlots);
-    console.log("Is time slot booked:", bookedTimeSlots.includes(time));
-    const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
+    // const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
 
     navigate("/booking-details", {
       state: {
@@ -70,9 +66,6 @@ function TimeSlotsPage() {
         time: time,
       },
     });
-
-    console.log("location state 3:", location.state);
-    console.log("Formatted Date: ", selectedDate);
   };
 
   return (
@@ -94,16 +87,23 @@ function TimeSlotsPage() {
                   <button
                     onClick={() => handleTimeSlotClick(timeSlot.time)}
                     className={`${
-                      timeSlot.status == "blocked"
+                      timeSlot.status === "blocked"
                         ? "bg-gray-300"
                         : "bg-indigo-600 hover:bg-indigo-700"
                     } w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-                    disabled={timeSlot.status == "blocked"}
+                    disabled={timeSlot.status === "blocked"}
                   >
                     {timeSlot.time}
                   </button>
                 </li>
               ))}
+              <div className="flex flex-col items-center justify-center w-1/6 mx-auto mt-4">
+                <div className="flex flex-col items-center justify-center bg-gray-600 hover:bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                  <button onClick={backClick} className="h-10 w-32 text-center">
+                    Back
+                  </button>
+                </div>
+              </div>
             </ul>
           </div>
         </div>

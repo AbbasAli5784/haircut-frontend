@@ -1,19 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext, createContext } from "react";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { motion } from "framer-motion";
-import { useContext } from "react";
-import { AuthContext } from "../components/context/AuthContext";
 import jwtDecode from "jwt-decode";
+import { TextField } from "@mui/material";
+import { AuthContext } from "../components/context/AuthContext";
+import BookingSummary from "./BookingSummary";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const { auth, admin, setAuth, setAdmin } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation();
 
+  const validateInputs = () => {
+    let isValid = true;
+
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Please Enter An Email!");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password) {
+      setPasswordError("Please Enter A Password!");
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    return isValid;
+  };
   const api = axios.create({
     baseURL: "http://localhost:3001/api",
     headers: {
@@ -24,12 +45,10 @@ function LoginPage() {
   api.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem("token");
-      console.log("Intercepted token: ", token);
 
       if (token) {
         config.headers.authorization = `Bearer ${token}`;
       }
-      console.log("Request headers after intercepting: ", config);
 
       return config;
     },
@@ -38,50 +57,55 @@ function LoginPage() {
     }
   );
 
-  const forgotPassword = async (e) => {
-    try {
-      const response = await api.post("/users/request-password-reset", {
-        email,
-      });
-    } catch (error) {
-      setError(error.response.data.message);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const isValid = validateInputs();
 
     try {
-      const { selectedService, selectedDate, time } = location.state || {}; // Access state here
-      const response = await api.post("/users/login", {
-        email,
-        password,
-      });
+      // const { selectedService, selectedDate, time } = location.state || {}; // Access state here
+      if (isValid) {
+        const response = await api.post("/users/login", {
+          email,
+          password,
+        });
+        localStorage.setItem("token", response.data.token);
+        const decodedToken = jwtDecode(response.data.token);
 
-      // Save the token in local storage (or you might use Redux, Context API, etc.)
-      localStorage.setItem("token", response.data.token);
-
-      console.log("Token:", response.data.token);
-
-      const decodedToken = jwtDecode(response.data.token);
-
-      console.log("Decoded Token", decodedToken);
-
-      if (decodedToken.role === "admin") {
-        navigate("/admin-panel");
-      } else {
-        navigate("/select-service");
+        setAuth(true);
+        if (decodedToken.role === "admin") {
+          setAdmin(true);
+        }
+        // Save the token in local storage (or you might use Redux, Context API, etc.)
       }
     } catch (error) {
       if (error.response) {
-        setError(error.response.data.message);
+        const errorMessage = error.response.data.message;
+
+        if (errorMessage === "User not found") {
+          setEmailError("User Not Found!");
+          setPasswordError(""); //clear the password error
+        } else if (errorMessage === "Incorrect Password") {
+          setPasswordError("Incorrect Password!");
+          setEmailError("");
+        } else {
+          setError(errorMessage);
+        }
       } else {
         // Log or set a general error message if there was a non-Axios error
         setError("An error occurred. Please try again.");
-        console.log("Error:", error);
       }
     }
   };
+  useEffect(() => {
+    if (auth) {
+      if (admin) {
+        navigate("/admin-panel");
+      } else {
+        navigate("/select-service");
+        console.log("Email:", email);
+      }
+    }
+  }, [auth, admin, navigate]);
 
   return (
     <>
@@ -101,32 +125,33 @@ function LoginPage() {
                 <label htmlFor="email-address" className="sr-only">
                   Email address
                 </label>
-                <input
+                <TextField
                   id="email-address"
-                  name="email"
+                  label="Email Address"
                   type="email"
                   autoComplete="email"
-                  required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  error={!!emailError}
+                  helperText={emailError}
                 />
               </div>
               <div>
                 <label htmlFor="password" className="sr-only">
                   Password
                 </label>
-                <input
+                <TextField
                   id="password"
-                  name="password"
+                  label="Password"
                   type="password"
                   autoComplete="current-password"
-                  required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  error={!!passwordError}
+                  helperText={passwordError}
                 />
               </div>
             </div>
