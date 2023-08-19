@@ -32,7 +32,7 @@ const UpdateBooking = () => {
   }, []);
   const getBookings = async (event) => {
     const response = await axios.get(
-      "http://localhost:3001/api/bookings/mybookings",
+      "https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/mybookings",
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include the session token in the request
@@ -45,7 +45,9 @@ const UpdateBooking = () => {
 
   const deleteAppointment = async () => {
     try {
-      await axios.delete(`http://localhost:3001/api/bookings/${selectedUser}`);
+      await axios.delete(
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/${selectedUser}`
+      );
       setSelectedUser(null);
       setIsDeleteModalOpen(false);
       setSnackbarMessage("Appointment Succesfully Cancelled!");
@@ -73,7 +75,7 @@ const UpdateBooking = () => {
 
     try {
       await axios.put(
-        `http://localhost:3001/api/bookings/${selectedUser}`,
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/${selectedUser}`,
         payload
       );
       setSnackbarMessage("Appointment Succesfully Updated!");
@@ -90,7 +92,7 @@ const UpdateBooking = () => {
       const timezone = "America/New_York";
       const convertedDate = moment(date).tz(timezone).format("YYYY-MM-DD");
       const response = await axios.get(
-        `http://localhost:3001/api/timeslots/date/${convertedDate}`
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/timeslots/date/${convertedDate}`
       );
       const data = response.data;
 

@@ -29,7 +29,7 @@ const AdminPanel = () => {
       const token = localStorage.getItem("token");
       const formattedDate = moment(date).format("YYYY-MM-DD");
       const response = await axios.get(
-        `http://localhost:3001/api/timeslots/date/${formattedDate}`,
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/timeslots/date/${formattedDate}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -62,7 +62,7 @@ const AdminPanel = () => {
       let response;
       if (timeslot.status === "available") {
         response = await axios.put(
-          `http://localhost:3001/api/timeslots/${timeslot._id}/block`,
+          `https://meencutz-8dba2b67ac9e.herokuapp.com/api/timeslots/${timeslot._id}/block`,
           {},
           {
             headers: {
@@ -76,7 +76,7 @@ const AdminPanel = () => {
         alert("You cannot make a booked timeslot available!");
       } else {
         response = await axios.put(
-          `http://localhost:3001/api/timeslots/${timeslot._id}/available`,
+          `https://meencutz-8dba2b67ac9e.herokuapp.com/${timeslot._id}/available`,
           {},
           {
             headers: {

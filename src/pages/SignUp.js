@@ -48,11 +48,14 @@ const Signup = () => {
 
     if (isValid) {
       try {
-        await axios.post("http://localhost:3001/api/users/register", {
-          username,
-          email,
-          password,
-        });
+        await axios.post(
+          "https://meencutz-8dba2b67ac9e.herokuapp.com/api/users/register",
+          {
+            username,
+            email,
+            password,
+          }
+        );
 
         navigate("/booking/login");
       } catch (error) {

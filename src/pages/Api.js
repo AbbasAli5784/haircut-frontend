@@ -2,7 +2,7 @@ import axios from "axios";
 
 export function getApi() {
   const api = axios.create({
-    baseURL: "http://localhost:3001/api",
+    baseURL: "https://meencutz-8dba2b67ac9e.herokuapp.com/api",
     headers: {
       "Content-Type": "application/json",
     },

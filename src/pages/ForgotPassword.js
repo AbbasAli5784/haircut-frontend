@@ -12,7 +12,7 @@ const ForgotPassword = () => {
     try {
      
       await axios.post(
-        "http://localhost:3001/api/users/request-password-reset",
+        "https://meencutz-8dba2b67ac9e.herokuapp.com/api/users/request-password-reset",
         {
           email,
         }

@@ -29,7 +29,7 @@ function TimeSlotsPage() {
       const timezone = "America/New_York";
       const convertedDate = moment(date).tz(timezone).format("YYYY-MM-DD");
       const response = await axios.get(
-        `http://localhost:3001/api/timeslots/date/${convertedDate}`
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/timeslots/date/${convertedDate}`
       );
       const data = response.data;
 

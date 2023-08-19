@@ -30,13 +30,12 @@ const DeleteAppointment = () => {
     Modal.setAppElement("#root");
   }, []);
 
-
   const getTimeSlots = async (date) => {
     try {
       const timezone = "America/New_York";
       const convertedDate = moment(date).tz(timezone).format("YYYY-MM-DD");
       const response = await axios.get(
-        `http://localhost:3001/api/timeslots/date/${convertedDate}`
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/timeslots/date/${convertedDate}`
       );
       const data = response.data;
 
@@ -56,7 +55,7 @@ const DeleteAppointment = () => {
   const fetchAppointments = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/api/bookings/booked"
+        "https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/booked"
       );
       setAppointments(response.data.data);
     } catch (err) {
@@ -66,7 +65,9 @@ const DeleteAppointment = () => {
 
   const deleteAppointment = async () => {
     try {
-      await axios.delete(`http://localhost:3001/api/bookings/${selectedUser}`);
+      await axios.delete(
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/${selectedUser}`
+      );
       setSelectedUser(null);
       setIsDeleteModalOpen(false);
       setSnackbarMessage("Appointment Succesfully Deleted!");
@@ -94,7 +95,7 @@ const DeleteAppointment = () => {
 
     try {
       await axios.put(
-        `http://localhost:3001/api/bookings/${selectedUser}`,
+        `https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/${selectedUser}`,
         payload
       );
 

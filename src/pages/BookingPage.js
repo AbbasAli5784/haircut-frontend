@@ -16,9 +16,8 @@ const BookingPage = () => {
   useEffect(() => {
     const fetchFullyBookedDates = async () => {
       const response = await axios.get(
-        "http://localhost:3001/api/bookings/fully-booked-dates"
+        "https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/fully-booked-dates"
       );
-     
 
       // Update the fully booked dates state with fetched data
       setFullyBookedDates(response.data);
