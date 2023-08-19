@@ -76,7 +76,7 @@ const AdminPanel = () => {
         alert("You cannot make a booked timeslot available!");
       } else {
         response = await axios.put(
-          `https://meencutz-8dba2b67ac9e.herokuapp.com/${timeslot._id}/available`,
+          `https://meencutz-8dba2b67ac9e.herokuapp.com/api/timeslots/${timeslot._id}/available`,
           {},
           {
             headers: {
