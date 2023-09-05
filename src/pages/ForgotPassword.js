@@ -10,7 +10,6 @@ const ForgotPassword = () => {
   const forgotPassword = async (e) => {
     e.preventDefault();
     try {
-     
       await axios.post(
         "https://meencutz-8dba2b67ac9e.herokuapp.com/api/users/request-password-reset",
         {
@@ -51,6 +50,7 @@ const ForgotPassword = () => {
               </div>
             </div>
             <button
+              onClick={forgotPassword}
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
