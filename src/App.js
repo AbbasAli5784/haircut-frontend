@@ -33,6 +33,7 @@ function App() {
           <Route path="/booking/login" element={<Auth />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route
             path="/update-booking"
             element={<ProtectedRoute element={<UpdateBooking />} />}
@@ -57,7 +58,7 @@ function App() {
             path="/booking/:serviceID"
             element={<ProtectedRoute element={<BookingPage />} />}
           />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+
           <Route
             path="/booking-details"
             element={<ProtectedRoute element={<BookingDetails />} />}
