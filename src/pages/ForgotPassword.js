@@ -10,12 +10,13 @@ const ForgotPassword = () => {
   const forgotPassword = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
+      const response = await axios.post(
         "https://meencutz-8dba2b67ac9e.herokuapp.com/api/users/request-password-reset",
         {
           email,
         }
       );
+      console.log("Response:", response);
     } catch (error) {
       setError(error.response.data.message);
       console.error("Error", error);

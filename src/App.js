@@ -20,6 +20,7 @@ import AdminPanel from "./components/AdminPanel";
 import DeleteAppointment from "./components/DeleteAppointment";
 import UpdateBooking from "./pages/UpdateBooking";
 import AuthRedirect from "./components/AuthRedirect";
+import ResetPassword from "./pages/ResetPassword";
 
 // import { Update } from "@mui/icons-material";
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/update-booking"
             element={<ProtectedRoute element={<UpdateBooking />} />}
