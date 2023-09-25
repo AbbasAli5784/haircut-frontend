@@ -57,7 +57,12 @@ const DeleteAppointment = () => {
       const response = await axios.get(
         "https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/booked"
       );
-      setAppointments(response.data.data);
+      const sortedAppointments = response.data.data.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB; // For ascending order. Use dateB - dateA for descending order.
+      });
+      setAppointments(sortedAppointments);
     } catch (err) {
       console.error(err);
     }
