@@ -20,18 +20,14 @@ const BookingSummary = () => {
     console.log("Email:", email);
 
     try {
-      await axios.post(
-        "https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings",
-        bookingData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.post("http://localhost:3001/api/bookings", bookingData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       await axios.post(
-        "https://meencutz-8dba2b67ac9e.herokuapp.com/api/bookings/booking-confirmation",
+        "http://localhost:3001/api/bookings/booking-confirmation",
         {
           email: email,
           service: selectedService.name,
